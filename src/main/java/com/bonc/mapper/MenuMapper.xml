@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.MenuMapper">
+
+	<insert id="addMenu" parameterType="java.util.HashMap">
+		insert into b_menu_1 
+		(menu_id,menu_name,menu_type,parent_id,perms,url,ord,attachment,remarks,state) 
+		values 
+		(#{menuId},#{menuName},#{menuType},#{parentId},#{perms},#{url},#{ord},#{attachment},#{remarks},#{deleteState}) 
+	</insert>
+	
+	<insert id="addRoleMenu" parameterType="java.util.HashMap">
+		INSERT INTO 
+			b_role_permission_1 (role_id,menu_id,state)
+		VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.roleId},#{item.menuId},#{item.deleteState})
+		</foreach>
+	</insert>
+	
+	<select id="getMenuById" resultType="java.util.HashMap">
+		select menu_id 'menuId',
+		menu_name 'menuName',
+		menu_type 'menuType',
+		parent_id 'parentId',
+		perms 'perms',
+		url 'url',
+		ord 'ord',
+		attachment 'attachment',
+		remarks 'remarks',
+		state 'state' 
+		from b_menu_1 
+		where menu_id=#{menuId} 
+	</select>
+	<select id="getMenuNameById" resultType="String">
+		select menu_name 'menuName' 
+		from b_menu_1 
+		where menu_id=#{menuId} 
+	</select>
+	
+	<update id="updateMenuById" parameterType="java.util.HashMap">
+		update b_menu_1 set 
+		menu_name=#{menuName},
+		menu_type=#{menuType},
+		parent_id=#{parentId},
+		perms=#{perms},
+		url=#{url},
+		ord=#{ord},
+		attachment=#{attachment},
+		remarks=#{remarks},
+		state=#{deleteState}  
+		where menu_id=#{menuId} 
+	</update>
+	
+	<delete id="deleteMenuById">
+		delete from b_menu_1 
+		where menu_id=#{menuId} 
+	</delete>
+	<delete id="deleteRoleMenuById">
+		delete from b_role_permission_1 
+		where menu_id=#{menuId}
+	</delete>
+	
+	<select id="getMenuChildById" resultType="java.util.HashMap">
+		select menu_id 'menuId',
+		menu_name 'menuName' 
+		from b_menu_1 
+		where parent_id=#{menuId} 
+	</select>
+	
+</mapper>

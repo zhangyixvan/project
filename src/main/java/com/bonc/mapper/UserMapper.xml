@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.UserMapper">
+	<select id="getUser" resultType="java.util.HashMap">
+		select user_id 'userId',
+		contact_name 'contactName' 
+		from t_sys_user_1 
+		where user_name=#{userName} 
+	</select>
+	
+	<insert id="addUser" parameterType="java.util.HashMap">
+		insert into t_sys_user_1 
+		(user_id,user_name,password,contact_name,email,state,create_time,remarks) 
+		values 
+		(#{userId},#{userName},#{password},#{contactName},#{email},#{deleteState},now(),#{remarks}) 
+	</insert>
+	<insert id="addUserDept" parameterType="java.util.HashMap">
+		insert into user_department_1 
+		(department_key,user_id,is_admin,dept_state)
+		values
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.deptNo},#{item.userId},#{item.isAdmin},#{item.deptState})
+		</foreach>
+	</insert>
+	<insert id="addUserRole" parameterType="java.util.HashMap">
+		INSERT INTO 
+			user_role_1 (role_id,user_id,state)
+		VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.roleId},#{item.userId},#{item.state})
+		</foreach>
+	</insert>
+	<insert id="addUserRoleDept" parameterType="java.util.HashMap">
+		insert into user_role_dept_1 (department_key,user_id,state,role_id) 
+		values 
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.deptNo},#{item.userId},#{item.state},#{item.roleId})
+		</foreach>
+	</insert>
+	
+	<select id="getUserById" resultType="java.util.HashMap">
+		select u.user_name 'userName',
+		u.user_id 'userId',
+		u.contact_name 'contactName',
+		ifnull(u.email,'') 'email',
+		ifnull(u.remarks,'') 'remarks',
+		u.state 'state' 
+		from t_sys_user_1 u 
+		where u.user_id=#{userId}
+	</select>
+	
+	<update id="updateUserById" parameterType="java.util.HashMap">
+		update t_sys_user_1 set
+		user_name=#{userName},
+		contact_name=#{contactName},
+		email=#{email},
+		remarks=#{remarks},
+		state=#{deleteState} 
+		where user_id=#{userId} 
+	</update>
+	
+	<update id="updatePasswordByUserId">
+		update t_sys_user_1 set
+		password=#{password} 
+		where user_id=#{userId} 
+	</update>
+	
+	<update id="updateUserDeptById">
+		update user_department_1 set
+		department_key=#{deptNo} 
+		where user_id=#{userId} 
+	</update>
+	
+	<select id="getUserPermsById" resultType="java.util.HashMap">
+		select 
+		r.role_id 'roleId',
+		r.role_name 'roleName',
+		u.state 'state' 
+		from user_role_1 u left join b_role_1 r 
+		on u.role_id=r.role_id 
+		where u.user_id=#{userId} 
+	</select>
+	
+	<update id="updateUserPermsById">
+		update user_role_1 set 
+		state=#{state} 
+		where user_id=#{userId} and role_id=#{roleId}
+	</update>
+	
+	<delete id="deleteUserById">
+		delete from t_sys_user_1 
+		where user_id=#{userId}
+	</delete>
+	
+	<delete id="deleteUserDeptById">
+		delete from user_department_1 
+		where user_id=#{userId}
+	</delete>
+	
+	<delete id="deleteUserRoleById">
+		delete from user_role_1 
+		where user_id=#{userId}
+	</delete>
+	
+	<!-- <select id="getAllDeptByUserId" resultType="java.util.HashMap">
+		select ud.department_key 'departmentKey',
+		sd.department_value 'departmentValue',
+		sd.parent_departmentkey 'parentDept',
+		ud.is_admin 'isAdmin',
+		ud.dept_state 'deptState' 
+		from user_department_1 ud left join sys_department_1 sd 
+		on ud.department_key=sd.department_key 
+		where ud.user_id=#{userId} 
+		and sd.state=0 
+	</select> -->
+	<!-- 2018-01-18修改为从user_role_dept_1表中获取数据 -->
+	<select id="getAllDeptByUserId" resultType="java.util.HashMap">
+		select urd.department_key 'departmentKey',
+		sd.department_value 'departmentValue',
+		sd.parent_departmentkey 'parentDept',
+		urd.state 'state' 
+		from user_role_dept_1 urd left join sys_department_1 sd 
+		on urd.department_key=sd.department_key 
+		where urd.user_id=#{userId} 
+		and sd.state=0 
+	</select>
+	
+	
+	<select id="getChild" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		department_value 'departmentValue',
+		parent_departmentkey 'parentDept' 
+		from sys_department_1 
+		where parent_departmentkey=#{departmentKey} 
+		and state=0 
+	</select>
+	
+	<select id="getUserDepts" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		department_value 'departmentValue',
+		parent_departmentkey 'parentDept' 
+		from sys_department_1 
+		where department_key in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		and state=0 
+	</select>
+	
+	<select id="getUsers" resultType="java.util.HashMap">
+		select su.user_id 'userId',
+		su.user_name 'userName',
+		su.contact_name 'contactName',
+		ifnull(su.email,"") 'email',
+		ifnull(su.remarks,"") 'remarks',
+		su.state 'state' 
+		from user_department_1 ud left join t_sys_user_1 su
+		on ud.user_id=su.user_id 
+		where ud.department_key in 
+		<foreach collection="list" close=")" index="index" item="item" open="(" separator=",">
+			#{item} 
+		</foreach>
+		group by ud.user_id 
+	</select>
+	
+	<!-- <select id="getUserDeptsById" resultType="java.util.HashMap">
+		select d.department_key 'departmentKey',
+		d.department_value 'departmentValue',
+		d.parent_departmentkey 'parentDeptKey',
+		d.ord 'ord',
+		ud.is_admin 'isAdmin',
+		ud.dept_state 'deptState' 
+		from user_department_1 ud left join sys_department_1 d 
+		on ud.department_key=d.department_key 
+		where ud.user_id=#{userId} 
+		and d.state=0 
+	</select> -->
+	<select id="getUserDeptsById" resultType="java.util.HashMap">
+		select d.department_key 'departmentKey',
+		d.department_value 'departmentValue',
+		d.parent_departmentkey 'parentDeptKey',
+		d.ord 'ord',
+		ud.state 'state' 
+		from user_role_dept_1 ud left join sys_department_1 d 
+		on ud.department_key=d.department_key 
+		where ud.user_id=#{userId} 
+		and d.state=0 
+		order by d.ord 
+	</select>
+	
+	<update id="updateUserDeptsById">
+		update user_department_1 set 
+		is_admin=#{isAdmin},
+		dept_state=#{state} 
+		where department_key=#{departmentKey} 
+		and user_id=#{userId} 
+	</update>
+	
+	<select id="getUserDeptByUserId" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		user_id 'userId' 
+		from user_department_1 
+		where is_admin=0 and dept_state=0 
+	</select>
+	
+	<select id="getAllUserByDeptNo" resultType="java.util.HashMap">
+		select 
+		u.user_id 'userId',
+		u.user_name 'userName',
+		ifnull(u.email,'') 'email',
+		u.contact_name 'contactName',
+		u.state 'state' 
+		from user_department_1 ud left join t_sys_user_1 u
+		on ud.user_id=u.user_id 
+		where ud.department_key=#{departmentKey} 
+		and ud.user_id=#{userId} and ud.is_admin=0 
+	</select>
+	
+	<update id="updateUserDeptRoleById">
+		update user_role_dept_1 set 
+		state=#{state} 
+		where 
+		department_key=#{departmentKey} 
+		and user_id=#{userId}
+	</update>
+	
+	<select id="getUserDeptPermsById" resultType="java.util.HashMap">
+		select urd.department_key 'departmentKey',
+		sd.department_value 'departmentValue',
+		urd.role_id 'roleId',
+		r.role_name 'roleName' 
+		from user_role_dept_1 urd left join b_role_1 r 
+		on urd.role_id=r.role_id left join sys_department_1 sd
+		on urd.department_key=sd.department_key 
+		where urd.department_key=#{departmentKey} and urd.user_id=#{userId} 
+	</select>
+	
+	<update id="updateUserDeptPermsById">
+		update user_role_dept_1 set 
+		role_id=#{roleId} 
+		where department_key=#{departmentKey} 
+		and user_id=#{userId} 
+	</update>
+	
+	<delete id="deleteUserDeptRoleById">
+		delete from user_role_dept_1 
+		where user_id=#{userId}
+	</delete>
+	
+	<select id="getRoleIdByUidDid" resultType="java.util.HashMap">
+		select r.role_id 'roleId',
+		r.role_name 'roleName',
+		r.parent_role_id 'parentRoleId' 
+		from user_role_dept_1 urd left join b_role_1 r
+		on urd.role_id=r.role_id 
+		where urd.state=0 
+		and urd.department_key=#{departmentKey} 
+		and urd.user_id=#{userId} 
+	</select>
+	
+	<select id="getChildRole" resultType="java.util.HashMap">
+		select role_id 'roleId',
+		role_name 'roleName',
+		parent_role_id 'parentRoleId' 
+		from b_role_1 
+		where parent_role_id=#{id} 
+	</select>
+	
+	<select id="getAllUserByRlist" resultType="java.util.HashMap">
+		select u.user_id 'userId',
+		u.user_name 'userName',
+		ifnull(u.email,'') 'email',
+		ifnull(u.remarks,'') 'remarks',
+		u.state 'state',
+		u.contact_name 'contactName' 
+		from user_role_dept_1 urd left join t_sys_user_1 u 
+		on urd.user_id=u.user_id 
+		where urd.department_key=#{departmentKey} 
+		and role_id=#{roleId} 
+	</select>
+</mapper>

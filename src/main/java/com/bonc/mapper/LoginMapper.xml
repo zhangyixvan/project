@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.LoginMapper">
+	
+	<select id="getRoleIds" resultType="java.util.HashMap">
+		select urd.role_id 'roleId',
+		r.role_name 'roleName' 
+		from user_role_dept_1 urd left join b_role_1 r 
+		on urd.role_id=r.role_id 
+		where urd.user_id=#{userId} and urd.state='0' 
+	</select>
+	
+	<select id="getAllMenu" resultType="java.util.HashMap">
+		select b.menu_id 'menuId',
+		b.menu_name 'menuName',
+		b.menu_type 'menuType',
+		b.parent_id 'parentId',
+		b.perms 'perms',
+		b.url 'url',
+		b.ord 'ord',
+		b.attachment 'attachment',
+		b.remarks 'remarks' 
+		from b_role_permission_1 rp left join 
+		b_menu_1 b on rp.menu_id=b.menu_id 
+		where rp.state=0 and rp.role_id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item} 
+        </foreach>
+        and b.state=0 and b.menu_type!='3'
+        group by b.menu_id 
+        order by b.ord 
+	</select>
+	
+</mapper>

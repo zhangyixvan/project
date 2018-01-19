@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.SelectMapper">
+	<select id="getAllRoles" resultType="java.util.HashMap">
+		select role_id 'roleId',
+		role_name 'roleName',
+		parent_role_id 'parentRoleId',
+		remarks 'remarks' 
+		from b_role_1 
+		group by role_id 
+	</select>
+	
+	<select id="getAllDepts" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		department_value 'departmentValue',
+		description 'description',
+		parent_departmentkey 'parentDeptKey' 
+		from sys_department_1 
+		group by department_key 
+		order by ord 
+	</select>
+	
+	<select id="getAllMenus" resultType="java.util.HashMap">
+		select menu_id 'menuId',
+		menu_name 'menuName',
+		parent_id 'parentId',
+		menu_type 'menuType',
+		perms 'perms',
+		url 'url',
+		ord 'ord',
+		attachment 'attachment',
+		remarks 'remarks',
+		state 'state'  
+		from b_menu_1 
+		group by menu_id 
+		order by ord
+	</select>
+	
+	<select id="getAllUsers" resultType="java.util.HashMap">
+		select user_id 'userId',
+		user_name 'userName',
+		ifnull(email,'') 'email',
+		ifnull(remarks,'') 'remarks',
+		contact_name 'contactName',
+		state 'state' 
+		from t_sys_user_1 
+		group by user_id 
+	</select>
+</mapper>

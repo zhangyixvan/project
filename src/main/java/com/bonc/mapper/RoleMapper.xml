@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.RoleMapper">
+
+	<insert id="addRole">
+		insert into b_role_1 
+		(role_id,role_name,create_time,remarks,parent_role_id) 
+		values 
+		(#{roleId},#{roleName},now(),#{remarks},#{parentRoleId}) 
+	</insert>
+	
+	<insert id="addRoleMenu" parameterType="java.util.HashMap">
+		INSERT INTO 
+			b_role_permission_1 (role_id,menu_id,state)
+		VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.roleId},#{item.menuId},#{item.deleteState})
+		</foreach>
+	</insert>
+	
+	<insert id="addUserRole" parameterType="java.util.HashMap">
+		INSERT INTO 
+			user_role_1 (role_id,user_id,state)
+		VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.roleId},#{item.userId},#{item.state})
+		</foreach>
+	</insert>
+	
+	<select id="getRoleById" resultType="java.util.HashMap">
+		select role_name 'roleName',
+		remarks 'remarks',
+		parent_role_id 'parentRoleId' 
+		from b_role_1 
+		where role_id=#{roleId} 
+	</select>
+	
+	<select id="getRoleMenu" resultType="java.util.HashMap">
+		select rp.role_id 'roleId',
+		rp.menu_id 'menuId',
+		rp.state 'state',
+		m.menu_name 'menuName',
+		m.menu_type 'menuType',
+		m.parent_id 'parentId'  
+		from b_role_permission_1 rp 
+		left join b_menu_1 m 
+		on rp.menu_id=m.menu_id 
+		where rp.role_id=#{roleId} 
+		and m.state=0 
+	</select>
+	
+	<update id="updateRoleById">
+		update b_role_1
+		set role_name=#{roleName},
+		remarks=#{remarks},
+		parent_role_id=#{parentRoleId} 
+		where role_id=#{roleId} 
+	</update>
+	
+	<update id="updateRoleMenuById" parameterType="java.util.HashMap">
+		<foreach collection="list" index="index" item="item" separator=";">
+			update b_role_permission_1        
+			set state=#{item.deleteState} 
+			where role_id=#{item.roleId} and menu_id=#{item.menuId} 
+		</foreach>
+	</update>
+	
+	<!-- 2018-01-16修改
+	<select id="getUserRole" resultType="java.util.HashMap">
+		select user_id 'userId',
+		role_id 'roleId' 
+		from user_role_1 
+		where role_id=#{roleId} and state=0
+	</select> -->
+	<select id="getUserRole" resultType="java.util.HashMap">
+		select user_id 'userId',
+		role_id 'roleId',
+		department_key 'departmentKey' 
+		from user_role_dept_1 
+		where role_id=#{roleId} and state=0
+	</select>
+	
+	<delete id="deleteRoleById">
+		delete from b_role_1 
+		where role_id=#{roleId}
+	</delete>
+	
+	<delete id="deleteRoleMenuById">
+		delete from b_role_permission_1 
+		where role_id=#{roleId} 
+	</delete>
+	
+	<delete id="deleteRoleUserById">
+		delete from user_role_1 
+		where role_id=#{roleId}
+	</delete>
+	
+	<select id="getParentRoleName" resultType="String">
+		select role_name 'roleName' 
+		from b_role_1 
+		where role_id=#{parentRoleId}
+	</select>
+	
+	<select id="getChildRole" resultType="java.util.HashMap">
+		select role_name 'roleName',
+		role_id 'roleId',
+		parent_role_id 'parentRoleId' 
+		from b_role_1 
+		where parent_role_id=#{roleId} 
+	</select>
+</mapper>

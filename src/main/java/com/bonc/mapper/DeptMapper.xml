@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.DeptMapper">
+	<insert id="addDept">
+		insert into sys_department_1 (department_key,department_value,state,description,parent_departmentkey,create_time,ord) 
+		values (#{id},#{departmentValue},#{deleteState},#{description},#{parentDeptKey},#{createTime},#{ord})
+	</insert>
+	<insert id="addDeptUser" parameterType="java.util.HashMap">
+		insert into user_department_1 (department_key,user_id,is_admin,dept_state)
+		values 
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.id},#{item.userId},1,1)
+		</foreach>
+	</insert>
+	<insert id="addDeptRoleUser" parameterType="java.util.HashMap">
+		insert into user_role_dept_1 (department_key,user_id,state,role_id) 
+		values
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.id},#{item.userId},#{item.state},#{item.roleId}) 
+		</foreach>
+	</insert>
+	
+	<select id="getDeptById" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		department_value 'departmentValue',
+		state 'state',
+		ifnull(description,'') 'description',
+		parent_departmentkey 'parentDeptKey' 
+		from sys_department_1 where department_key=#{id} 
+	</select>
+	
+	<select id="getDeptValueById" resultType="String">
+		select department_value 'departmentValue' 
+		from sys_department_1 where department_key=#{id}
+	</select>
+	
+	<update id="updateDeptById">
+		update sys_department_1 
+		set department_value=#{departmentValue},description=#{description},state=#{deleteState},ord=#{ord} 
+		where department_key=#{id} 
+	</update>
+	
+	<delete id="deleteDeptById">
+		delete from sys_department_1 
+		where department_key=#{departmentKey} 
+	</delete>
+	
+	<delete id="deleteDeptUserById">
+		delete from user_department_1 
+		where department_key=#{id} 
+	</delete>
+	
+	<delete id="deleteDeptRoleUserById">
+		delete from user_role_dept_1 
+		where department_key=#{departmentKey}
+	</delete>
+	
+	<!-- 2018-01-16修改
+	<select id="getUserDeptById" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		user_id 'userId' 
+		from user_department_1 
+		where department_key=#{departmentKey} and dept_state=0 
+	</select> -->
+	
+	<select id="getUserDeptById" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		user_id 'userId',
+		role_id 'roleId' 
+		from user_role_dept_1 
+		where department_key=#{departmentKey} and state=0 
+	</select>
+	
+	<select id="getChildDeptById" resultType="java.util.HashMap">
+		select department_key 'departmentKey',
+		department_value 'departmentValue' 
+		from sys_department_1 
+		where parent_departmentkey=#{departmentKey} 
+	</select>
+	
+</mapper>

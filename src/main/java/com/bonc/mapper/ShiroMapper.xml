@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bonc.mapper.ShiroMapper">
+	<select id="findByName11111111111111111111111111111" resultType="java.util.HashMap">
+		select t.user_id 'userId',
+		t.user_name 'userName',
+		t.email 'email',
+		t.password 'password',
+		u.role_id 'roleId',
+		t.create_time 'createTime' 
+		from t_sys_user_1 t left join user_role_1 u 
+		on t.user_id=u.user_id 
+		where t.user_name=#{name} and t.state=0
+	</select>
+	<select id="findByName" resultType="java.util.HashMap">
+		select t.user_id 'userId',
+		t.user_name 'userName',
+		t.contact_name 'contactName',
+		ifnull(t.email,'') 'email',
+		ifnull(t.remarks,'') 'remarks',
+		t.password 'password',
+		t.create_time 'createTime',
+		t.state 'state' 
+		from t_sys_user_1 t 
+		where t.user_name=#{name}
+	</select>
+	
+	<select id="findPermissionByUid" resultType="java.util.HashMap">
+		select 
+		r.role_id 'roleId',
+		r.menu_id 'menuId',
+		b.menu_name 'menuName',
+		b.menu_type 'menuType',
+		b.parent_id 'parentId',
+		b.perms 'perms',
+		b.url 'url',
+		b.ord 'ord' 
+		from b_role_permission_1 r left join b_menu_1 b on r.menu_id=b.menu_id 
+		where r.role_id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item} 
+        </foreach>
+		and b.menu_name is not null and b.state=0 and r.state=0 
+		order by b.ord 
+	</select>
+	
+	
+	<select id="getFilterChain" resultType="java.util.LinkedHashMap">
+		select url 'url',
+		roles 'roles' 
+		from b_url_1 
+		where state=0 
+		order by ord 
+	</select>
+	
+	
+</mapper>
