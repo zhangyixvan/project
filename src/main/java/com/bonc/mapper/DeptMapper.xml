@@ -79,4 +79,10 @@
 		where parent_departmentkey=#{departmentKey} 
 	</select>
 	
+	
+	<!-- <select id="getAllTest" resultType="int">
+		select count(*) from magic_wand.t_page_visit_log p 
+	</select> -->
+	
+	
 </mapper>

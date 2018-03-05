@@ -277,9 +277,13 @@ public class UserServiceImpl implements UserService {
 		}
 		//根据获取的roleIds以及传入的departmentKey去数据库查询所有的可操作的用户信息
 		for(String roleid:roleIds) {
-			Map<String,Object> userMap=userMapper.getAllUserByRlist(departmentKey,roleid);
-			if(!(userMap==null||userMap.isEmpty())) {
-				list.add(userMap);
+			List<Map<String,Object>> userList=userMapper.getAllUserByRlist(departmentKey,roleid);
+			if(!(userList==null||userList.isEmpty())) {
+				for(Map<String,Object> userMap:userList) {
+					if(!(userMap==null||userMap.isEmpty())) {
+						list.add(userMap);
+					}
+				}
 			}
 		}
 		return list;

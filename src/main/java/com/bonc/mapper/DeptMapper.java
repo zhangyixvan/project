@@ -33,4 +33,11 @@ public interface DeptMapper {
 
 	public int deleteDeptRoleUserById(@Param("departmentKey")String departmentKey);
 	
+	
+	
+	
+	
+//	public int getAllTest();
+	
+	
 }

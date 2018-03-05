@@ -64,6 +64,6 @@ public interface UserMapper {
 
 	public List<Map<String, Object>> getChildRole(@Param("id")String id);
 
-	public Map<String, Object> getAllUserByRlist(@Param("departmentKey")String departmentKey, @Param("roleId")String roleId);
+	public List<Map<String, Object>> getAllUserByRlist(@Param("departmentKey")String departmentKey, @Param("roleId")String roleId);
 
 }

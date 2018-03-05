@@ -233,7 +233,7 @@
 		from user_role_dept_1 urd left join b_role_1 r 
 		on urd.role_id=r.role_id left join sys_department_1 sd
 		on urd.department_key=sd.department_key 
-		where urd.department_key=#{departmentKey} and urd.user_id=#{userId} 
+		where urd.department_key=#{departmentKey} and urd.user_id=#{userId} and urd.state=0 
 	</select>
 	
 	<update id="updateUserDeptPermsById">
