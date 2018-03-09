@@ -138,7 +138,7 @@ public class RoleController {
 			list.add(map);
 		}
 		if(roleService.updateRoleMenuById(list)) {
-			return new JsonResultNew<>("修改成功！");
+			return new JsonResultNew<>(MyBusinessEnum.BUSINESS_SUCCESS,"修改成功！");
 		} else {
 			return new JsonResultNew<>(MyBusinessEnum.BUSINESS_ERROR,"修改失败！");
 		}
