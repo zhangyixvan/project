@@ -28,7 +28,8 @@ public class DeptController {
 	 * 2018-01-16修改为，设置为单次添加，只添加部门信息
 	 * 2018-01-17修改为，设置为单词添加，添加部门信息之后，为所有的用户，
 	 * 		在用户部门角色表中添加对应的关系，角色role_id都为空，state都为1
-	 * 
+	 *
+	 *
 	 * parentDeptKey 	父亲部门
 	 * departmentValue 	部门名称
 	 * description 		描述，可为空，可不传
